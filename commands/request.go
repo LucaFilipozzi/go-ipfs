@@ -15,8 +15,6 @@ import (
 	u "github.com/jbenet/go-ipfs/util"
 )
 
-type optMap map[string]interface{}
-
 type Context struct {
 	// this Context is temporary. Will be replaced soon, as we get
 	// rid of this variable entirely.
@@ -68,7 +66,7 @@ func (c *Context) NodeWithoutConstructing() *core.IpfsNode {
 type Request interface {
 	Path() []string
 	Option(name string) *OptionValue
-	Options() optMap
+	Options() map[string]interface{}
 	SetOption(name string, val interface{})
 	SetOptions(opts map[string]interface{}) error
 	Arguments() []string
@@ -86,7 +84,7 @@ type Request interface {
 
 type request struct {
 	path       []string
-	options    optMap
+	options    map[string]interface{}
 	arguments  []string
 	files      files.File
 	cmd        *Command
@@ -122,8 +120,8 @@ func (r *request) Option(name string) *OptionValue {
 }
 
 // Options returns a copy of the option map
-func (r *request) Options() optMap {
-	output := make(optMap)
+func (r *request) Options() map[string]interface{} {
+	output := make(map[string]interface{})
 	for k, v := range r.options {
 		output[k] = v
 	}
@@ -273,7 +271,7 @@ func NewEmptyRequest() (Request, error) {
 
 // NewRequest returns a request initialized with given arguments
 // An non-nil error will be returned if the provided option values are invalid
-func NewRequest(path []string, opts optMap, args []string, file files.File, cmd *Command, optDefs map[string]Option) (Request, error) {
+func NewRequest(path []string, opts map[string]interface{}, args []string, file files.File, cmd *Command, optDefs map[string]Option) (Request, error) {
 	if path == nil {
 		path = make([]string, 0)
 	}
